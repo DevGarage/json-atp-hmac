@@ -61,6 +61,12 @@ class JsonAtpHmac {
         if(strlen($hash_token) !== self::HASH_LENGTH)
             throw new Exception('Wrong token hash length',12);
 
+        ## HASH MESSAGE ##
+        $this->signature = self::hash(self::hash($message,$this->key_public),$this->key_token);
+
+        if(strlen($this->signature) !== self::HASH_LENGTH)
+            throw new Exception('Wrong signature length',13);
+
         ## COMPRESS MESSAGE ##
         $message = self::compress($message);
 
@@ -76,13 +82,7 @@ class JsonAtpHmac {
         ## BASE64 MESSAGE ##
         $msg = base64_encode($message);
 
-        ## HASH MESSAGE ##
-        $this->signature = self::hash(self::hash($msg,$this->key_public),$this->key_token);
-
-        if(strlen($this->signature) !== self::HASH_LENGTH)
-            throw new Exception('Wrong signature length',13);
-
-        if($message === false)
+        if($msg === false)
             throw new Exception("Error in base64 encoding!",16);
 
         return $this->signature . $hash_token . $this->flag  . $msg;
@@ -115,13 +115,6 @@ class JsonAtpHmac {
         ## GET MESSAGE ##
         $msg = substr($message,self::HASH_LENGTH * 2 + 1);
 
-        ## HASH MESSAGE ##
-        $this->signature = self::hash(self::hash($msg,$this->key_public),$this->key_token);
-
-        ## COMPARE SIGNATURE ##
-        if(strcmp($this->signature,$msg_signature) != 0)
-            throw new Exception('Wrong signature',22);
-
         ## BASE64 DECODE ##
         $msg = base64_decode($msg);
 
@@ -130,6 +123,13 @@ class JsonAtpHmac {
 
         ## DECOMPRESS MESSAGE ##
         $msg = self::uncompress($msg);
+
+        ## HASH MESSAGE ##
+        $this->signature = self::hash(self::hash($msg,$this->key_public),$this->key_token);
+
+        ## COMPARE SIGNATURE ##
+        if(strcmp($this->signature,$msg_signature) != 0)
+            throw new Exception('Wrong signature',22);
 
         return $msg;
     }

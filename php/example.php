@@ -15,23 +15,27 @@
 
 require_once('json-atp-hmac.php');
 
-$atphamc = new JsonAtpHmac();
-
 try{
 
+    ## New instance
+    $atphamc = new JsonAtpHmac();
+
+    ## Set token name (Clients ID)
     $atphamc->setToken('client-1');
+
+    ## Set public and private key (token key)
     $atphamc->setKey('public-key','private-key-for-client-1');
 
+    ## Encode message
     $encmsg = $atphamc->encode('Super secret message!');
 
-    var_dump($atphamc, $encmsg,sha1('cls1'));
+    ## Show status end encoded message ##
+    var_dump($atphamc, $encmsg);
 
+    ## Clear instance
     $atphamc->clear();
 
-    var_dump($atphamc,$atphamc->getToken($encmsg));
-
-
-    ## Get hash from Token
+    ## Get token (client) hash from message
     var_dump($atphamc->getToken($encmsg));
 
     ## Set Key
