@@ -1,4 +1,4 @@
 json-atp-hmac
 =============
 
-Json Advanced Protocol with HMAC
+Json Advanced Transport Protocol with HMAC
