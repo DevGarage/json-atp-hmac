@@ -5,8 +5,8 @@
  * Author: Bubelich Nikolay
  * Email: thesimj@gmail.com
  * GitHub: https://github.com/DevGarage/json-atp-hmac
- * Date: 29.11.13
- * VERSION 0.1
+ * Date: 02.01.2014
+ * VERSION 0.2
  *
  * =========================================
  * Apache License, Version 2.0, January 2004
@@ -26,6 +26,8 @@ try{
     ## Set public and private key (token key)
     $atphamc->setKey('public-key','private-key-for-client-1');
 
+//    $atphamc->setFlag(JsonAtpHmac::FLAG_CLEAR_TEXT);
+
     ## Encode message
     $encmsg = $atphamc->encode('Super secret message!');
 
@@ -37,6 +39,8 @@ try{
 
     ## Get token (client) hash from message
     var_dump($atphamc->getToken($encmsg));
+
+    $encmsg = 'cda92dc03e91ddd2d018fe89c506b30f020e23b8c361c11776adfa8308d25677d52087b3f67fbb671U3VwZXIgc2VjcmV0IG1lc3NhZ2Uh';
 
     ## Set Key
     $atphamc->setKey('public-key','private-key-for-client-1');

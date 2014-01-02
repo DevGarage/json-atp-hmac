@@ -5,8 +5,8 @@
  * Author: Bubelich Nikolay
  * Email: thesimj@gmail.com
  * GitHub: https://github.com/DevGarage/json-atp-hmac
- * Date: 29.11.13
- * VERSION 0.1
+ * Date: 02.01.2014
+ * VERSION 0.2
  *
  * =========================================
  * Apache License, Version 2.0, January 2004
@@ -14,7 +14,7 @@
  */
 
 class JsonAtpHmac {
-    const PROTOCOL          = 1;
+    const PROTOCOL          = 2;
 
     const FLAG_ERROR        = 0x0;
     const FLAG_CLEAR_TEXT   = 0x1;
@@ -38,19 +38,6 @@ class JsonAtpHmac {
     private $token          = null;
     private $signature      = null;
 
-    public static function hash($data,$key = null){
-        return hash_hmac(self::HASH_ALGORITHM,$data,$key);
-    }
-
-    public function clear(){
-        $this->token        = null;
-
-        $this->flag         = self::FLAG_DEFAULT;
-        $this->key_public   = null;
-        $this->key_token    = null;
-        $this->signature    = null;
-    }
-
     public function encode($message){
         if( !is_string($message) ||  strlen($message) < 0 )
             throw new Exception('Wrong message',11);
@@ -62,7 +49,7 @@ class JsonAtpHmac {
             throw new Exception('Wrong token hash length',12);
 
         ## HASH MESSAGE ##
-        $this->signature = self::hash(self::hash($message,$this->key_public),$this->key_token);
+        $this->signature = self::hash(self::hash(self::hash($message,$this->key_token),$this->key_public),$hash_token);
 
         if(strlen($this->signature) !== self::HASH_LENGTH)
             throw new Exception('Wrong signature length',13);
@@ -125,13 +112,26 @@ class JsonAtpHmac {
         $msg = self::uncompress($msg);
 
         ## HASH MESSAGE ##
-        $this->signature = self::hash(self::hash($msg,$this->key_public),$this->key_token);
+        $this->signature = self::hash(self::hash(self::hash($msg,$this->key_token),$this->key_public),$this->token);
 
         ## COMPARE SIGNATURE ##
         if(strcmp($this->signature,$msg_signature) != 0)
             throw new Exception('Wrong signature',22);
 
         return $msg;
+    }
+
+    public static function hash($data,$key = null){
+        return hash_hmac(self::HASH_ALGORITHM,$data,$key);
+    }
+
+    public function clear(){
+        $this->token        = null;
+
+        $this->flag         = self::FLAG_DEFAULT;
+        $this->key_public   = null;
+        $this->key_token    = null;
+        $this->signature    = null;
     }
 
     public static function error($token, $message, $code){
